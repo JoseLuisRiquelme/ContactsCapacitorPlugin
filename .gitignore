@@ -68,3 +68,27 @@ captures
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
+
+# Angular
+.angular
+
+# Capacitor
+DerivedData/
+xcuserdata/
+*.xcworkspace
+*.xcuserstate
+
+*.keystore
+
+# IDE
+.vscode/
+
+# Archivos generados npm o capacitor
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
