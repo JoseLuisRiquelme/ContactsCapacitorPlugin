@@ -3,6 +3,7 @@ package cl.colabora.contacts.plugin
 import android.Manifest
 import android.content.Context
 import android.provider.ContactsContract
+import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
@@ -49,18 +50,18 @@ class ContactsPluginPlugin : Plugin() {
     private fun fetchContactsAsync(call:PluginCall){
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val contactsArray = JSArray()
                 val contacts = fetchContacts(context)
                 withContext(Dispatchers.Main) {
-                    val result = JSObject().apply {
-                        put("contacts",contacts.map{
-                            JSObject().apply {
-                                put("id",it.id)
-                                put("name",it.name)
-                                put("phones",it.phoneNumbers)
+                    contacts.forEach{contact->
+                        val result = JSObject().apply {
+                                    put("id",contact.id)
+                                    put("name",contact.name)
+                                    put("phones", JSArray(contact.phoneNumbers))
                             }
-                        })
+
+                        contactsArray.put(result)
                     }
-                    call.resolve(result)
                 }
             }catch (e: Exception){
                 withContext(Dispatchers.Main) {
