@@ -3,7 +3,6 @@ package cl.colabora.contacts.plugin
 import android.Manifest
 import android.content.Context
 import android.provider.ContactsContract
-import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
@@ -36,18 +35,18 @@ class ContactsPluginPlugin : Plugin() {
             requestPermissionForAlias("contacts", call, "contactsPermsCallback")
             return
         }
-        fetContactsAsync(call)
+        fetchContactsAsync(call)
     }
 
     @PermissionCallback
     private fun contactsPermsCallback(call: PluginCall) {
         if (getPermissionState("contacts") == PermissionState.GRANTED) {
-            fetContactsAsync(call)
+            fetchContactsAsync(call)
         } else {
             call.reject(("Permiso de contactos denegado"))
         }
     }
-    private fun fetContactsAsync(call:PluginCall){
+    private fun fetchContactsAsync(call:PluginCall){
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val contacts = fetchContacts(context)
@@ -65,7 +64,7 @@ class ContactsPluginPlugin : Plugin() {
                 }
             }catch (e: Exception){
                 withContext(Dispatchers.Main) {
-                    call.reject("Error obteniendo contactos: ${e.message}")
+                    call.reject("Error obteniendo contactos desde le plugin: ${e.message}")
                 }
             }
         }
@@ -108,7 +107,7 @@ class ContactsPluginPlugin : Plugin() {
                             if (pc.moveToNext()) {
                                 pc.getString(pc.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
                             } else null
-                        }.filterNotNull().toList()
+                        }.toList()
                     } ?: emptyList()
 
                     Contact(contactId, contactName, phoneNumbers)
