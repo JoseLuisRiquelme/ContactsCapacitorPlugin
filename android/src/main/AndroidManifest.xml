@@ -1,3 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <application>
+        <activity
+            android:name = "cl.colabora.contacts.plugin.composescreens.ComposeActivity"
+            android:exported = "true"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+    </application>
 </manifest>

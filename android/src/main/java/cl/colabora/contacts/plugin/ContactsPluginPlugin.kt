@@ -2,7 +2,9 @@ package cl.colabora.contacts.plugin
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.provider.ContactsContract
+import cl.colabora.contacts.plugin.composescreens.ComposeActivity
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
@@ -31,6 +33,17 @@ class ContactsPluginPlugin : Plugin() {
 //    }
 
     @PluginMethod
+    fun openNativeView(call:PluginCall){
+        val context = bridge.activity
+
+        val username= call.getString("username")?: "Invitado"
+        val intent = Intent(context, ComposeActivity::class.java)
+        intent.putExtra("username",username)
+        context.startActivity(intent)
+        call.resolve()
+    }
+
+    @PluginMethod
     fun getContacts(call: PluginCall) {
         if (getPermissionState("contacts") != PermissionState.GRANTED) {
             requestPermissionForAlias("contacts", call, "contactsPermsCallback")
@@ -52,16 +65,20 @@ class ContactsPluginPlugin : Plugin() {
             try {
                 val contactsArray = JSArray()
                 val contacts = fetchContacts(context)
-                withContext(Dispatchers.Main) {
-                    contacts.forEach{contact->
-                        val result = JSObject().apply {
-                                    put("id",contact.id)
-                                    put("name",contact.name)
-                                    put("phones", JSArray(contact.phoneNumbers))
-                            }
-
-                        contactsArray.put(result)
+                contacts.forEach{contact->
+                    val contactObject = JSObject().apply {
+                        put("id",contact.id)
+                        put("name",contact.name)
+                        put("phones", JSArray(contact.phoneNumbers))
                     }
+
+                    contactsArray.put(contactObject)
+                }
+                withContext(Dispatchers.Main) {
+                    val result = JSObject().apply {
+                        put("contacts",contactsArray)
+                    }
+                    call.resolve(result)
                 }
             }catch (e: Exception){
                 withContext(Dispatchers.Main) {
